@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- #5ce1e6 -->
+    <color name="splashscreen_bg">#352245</color>
+    <color name="statusbar_bg">#352245</color>
+    <color name="statusbartxt_bg">#ffffff</color> 
+    <color name="app_bg">#ffffff</color>
+    <color name="apptxt_bg">#000000</color>
+</resources>
