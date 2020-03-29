@@ -11,92 +11,85 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 
+import { db, auth } from "../config/index"
+import User from '../../User'
+
 export default class Contact extends Component {
     constructor(props) {
         super(props)
+        this._isMounted = false;
         this.state = {
-            data_contact: [
-                {
-                    id: 'Rc0LjZ54yj',
-                    user_id: 'trongtinh_Rc0LjZ54yj',
-                    user_name: 'DWI',
-                    user_avatar: require("../assets/images/Ava-Man.png"),
-                    user_phonenumber: '+84 93456788'
-                },
-                {
-                    id: 'MhiUfuWzr2',
-                    user_id: 'tranthanh_MhiUfuWzr2',
-                    user_name: 'MANNISAR',
-                    user_avatar: require("../assets/images/Ava-Man.png"),
-                    user_phonenumber: '+84 78346789'
-                },
-                {
-                    id: 'R3J4WUoWXJ',
-                    user_id: 'huynhnhu_R3J4WUoWXJ',
-                    user_name: 'UYEEE',
-                    user_avatar: require("../assets/images/Ava-Man.png"),
-                    user_phonenumber: '+84 95661237'
-                },
-                {
-                    id: 'ucPA0NXweB',
-                    user_id: 'dinhtrong_ucPA0NXweB',
-                    user_name: 'MAMANG',
-                    user_avatar: require("../assets/images/Ava-Man.png"),
-                    user_phonenumber: '+84 33674824'
-                },
-
-                {
-                    id: 'wfbMalbY9l',
-                    user_id: 'truonggiang_wfbMalbY9l',
-                    user_name: 'KESBOR',
-                    user_avatar: require("../assets/images/Ava-Man.png"),
-                    user_phonenumber: '+84 78346789'
-                },
-                {
-                    id: 'IlpBApYmye',
-                    user_id: 'trongthat_IlpBApYmye',
-                    user_name: 'MAMANG',
-                    user_avatar: require("../assets/images/Ava-Man.png"),
-                    user_phonenumber: '+84 4532012'
-                },
-            ]
+            user: [],
+            uid: null,
+            dbRef: db.ref('user')
         }
+    }
+
+    async componentDidMount() {
+        this._isMounted = true;
+        await this.state.dbRef.on('child_added', val => {
+            let person = val.val();
+            person.uid = val.key;
+            if (person.uid === auth.currentUser.uid) {
+                // User.uid = person.uid;
+                User.name = person.name;
+                User.email = person.email;
+                User.phone = person.phone;
+                User.image = person.image ? person.image : null;
+            } else {
+                this.setState(prevState => {
+                    return {
+                        user: [...prevState.user, person],
+                    };
+                });
+            }
+        });
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+        this.state.dbRef.off();
     }
 
     renderItem = ({ item }) => {
         return (
-            <TouchableOpacity style={styles.item_container}>
+            <View style={styles.item_container}>
                 <Image
-                    source={item.user_avatar}
+                    source={item.image ? { uri: item.image } : require('../assets/images/Ava-Man.png')}
                     style={{ width: 80, height: 80 }}
+                    resizeMode={'stretch'}
                 />
                 <View style={styles.user}>
                     <View>
-                        <Text style={styles.textName}>{item.user_name}</Text>
-                        <Text style={styles.textNumber}>{item.user_phonenumber}</Text>
+                        <Text style={styles.textName}>{item.name}</Text>
+                        <Text style={styles.textNumber}>{item.phone}</Text>
                     </View>
-                    <TouchableOpacity style={styles.call}>
-                        <MaterialIcons name="call" color="#5ce1e6" size={20} />
+                    <TouchableOpacity style={styles.icon} onPress={() => this.props.navigation.navigate('Message', item)}>
+                        <MaterialIcons name="message" color="#5ce1e6" size={35} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.icon}>
+                        <MaterialIcons name="call" color="#5ce1e6" size={35} />
                     </TouchableOpacity>
                 </View>
-            </TouchableOpacity>
+            </View>
         )
     }
 
     render() {
+        console.disableYellowBox = true
         return (
             <View style={styles.container}>
                 <LinearGradient start={{ x: 1, y: -2 }} colors={['#5ce1e6', '#352245']} style={styles.header}>
                     <Text style={styles.textHeader}>CONTACT</Text>
-                    <TouchableOpacity style={styles.add}>
+                    {/* <TouchableOpacity style={styles.add}>
                         <AntDesign name="pluscircle" color="white" size={25} />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </LinearGradient>
                 <View style={styles.flatList}>
                     <FlatList
-                        data={this.state.data_contact}
+                        data={this.state.user}
                         renderItem={this.renderItem}
-                        keyExtractor={(item) => item.id.toString()}
+                        keyExtractor={(item) => item.uid}
                     />
                 </View>
             </View>
@@ -134,8 +127,8 @@ var styles = StyleSheet.create({
     item_container: {
         flex: 1,
         flexDirection: 'row',
-        paddingHorizontal: 15,
-        paddingVertical: 15
+        // paddingHorizontal: 15,
+        // paddingVertical: 15
     },
     flatList: {
         flex: 1
@@ -156,8 +149,10 @@ var styles = StyleSheet.create({
         color: 'gray',
         marginTop: 5
     },
-    call: {
-        position: 'absolute',
-        right: 0
+    icon: {
+        // position: 'absolute',
+        // marginLeft: 10,
+        marginHorizontal: 8,
+        left: 50
     }
 });

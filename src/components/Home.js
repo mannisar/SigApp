@@ -4,7 +4,6 @@ import {
     Text,
     TextInput,
     StyleSheet,
-    ImageBackground,
     Image,
     TouchableOpacity,
     Dimensions,
@@ -14,8 +13,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import AsyncStorage from '@react-native-community/async-storage';
-import { db } from "../config/index"
+import { db, auth } from "../config/index"
 import User from '../../User'
 
 export default class Messages extends Component {
@@ -25,22 +23,27 @@ export default class Messages extends Component {
         this.state = {
             user: [],
             uid: null,
+            latitude: '',
+            longitude: '',
+            message: 'BLABLABLA',
+            num_messages_readed: 100,
             dbRef: db.ref('user')
         }
     }
 
     async componentDidMount() {
         this._isMounted = true;
-        await this.get()
         await this.state.dbRef.on('child_added', val => {
             let person = val.val();
             person.uid = val.key;
-            if (person.uid === this.state.uid) {
-                // User.uid = person.uid;
+            if (person.uid === auth.currentUser.uid) {
+                User.uid = person.uid;
                 User.name = person.name;
                 User.email = person.email;
                 User.phone = person.phone;
                 User.image = person.image ? person.image : null;
+                User.latitude = person.latitude;
+                User.longitude = person.longitude;
             } else {
                 this.setState(prevState => {
                     return {
@@ -56,15 +59,6 @@ export default class Messages extends Component {
         this.state.dbRef.off();
     }
 
-    async get() {
-        try {
-            const uid = await AsyncStorage.getItem("uid");
-            this.setState({ uid: uid })
-        } catch (error) {
-            console.log("Something went wrong", error);
-        }
-    }
-
     renderItem = ({ item }) => {
         return (
             <TouchableOpacity style={styles.item_container} onPress={() => this.props.navigation.navigate('Message', item)}>
@@ -78,8 +72,8 @@ export default class Messages extends Component {
                         <Text style={{ color: 'black', fontWeight: item.readed ? null : 'bold' }}>
                             {item.name}
                         </Text>
-                        <Text style={{ color: 'black', fontSize: 12, fontWeight: item.readed ? null : 'bold' }}>
-                            {item.message}
+                        <Text style={{ color: 'black', fontSize: 12, fontWeight: item.readed ? null : 'regular' }}>
+                            {this.state.message}
                         </Text>
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
@@ -89,7 +83,7 @@ export default class Messages extends Component {
                         {item.readed ? null :
                             <View style={styles.num_readed}>
                                 <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>
-                                    {item.num_messages_readed > 10 ? "10+" : item.num_messages_readed}
+                                    {this.state.num_messages_readed > 99 ? "99+" : this.state.num_messages_readed}
                                 </Text>
                             </View>
                         }
@@ -106,6 +100,7 @@ export default class Messages extends Component {
     }
 
     render() {
+        console.disableYellowBox = true
         return (
             <View style={styles.container}>
                 {/* <View style={styles.header}> */}

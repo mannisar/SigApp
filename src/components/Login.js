@@ -13,7 +13,6 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 
 import { auth } from "../config/index";
-import AsyncStorage from '@react-native-community/async-storage';
 
 export default class Login extends Component {
     constructor(props) {
@@ -38,14 +37,6 @@ export default class Login extends Component {
         this._isMounted = false;
     }
 
-    async setUid(uid) {
-        try {
-            await AsyncStorage.setItem("uid", uid);
-        } catch (error) {
-            console.log("Something went wrong", error);
-        }
-    }
-
     handleLogin = async () => {
         const { email, password } = this.state;
         if (email.length < 6) {
@@ -61,7 +52,6 @@ export default class Login extends Component {
         } else {
             await auth.signInWithEmailAndPassword(email, password)
                 .then(async data => {
-                    this.setUid(data.user.uid)
                     ToastAndroid.show("Success", ToastAndroid.LONG)
                     this.props.navigation.navigate("Home")
                 })
@@ -70,6 +60,7 @@ export default class Login extends Component {
     };
 
     render() {
+        console.disableYellowBox = true
         return (
             <View style={styles.container}>
                 <View style={styles.header}>

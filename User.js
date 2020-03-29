@@ -1,9 +1,11 @@
 const User = {
-    // uid: null,
+    uid: null,
     name: null,
     email: null,
     phone: null,
-    image: null
+    image: null,
+    latitude: null,
+    longitude: null
 }
 
 export default User;

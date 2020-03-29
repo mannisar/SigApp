@@ -9,6 +9,7 @@ import {
     ToastAndroid
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import GetLocation from 'react-native-get-location'
 
 import { auth, db } from '../config/index'
 
@@ -27,13 +28,27 @@ export default class Register extends Component {
             errorMessage: null,
             loading: false,
             updatesEnabled: false,
+            location: []
         }
         this.handleRegister = this.handleRegister.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         this._isMounted = true;
-
+        await GetLocation.getCurrentPosition({
+            enableHighAccuracy: true,
+            timeout: 15000,
+        })
+            .then(location => {
+                console.log(location);
+                this.setState({
+                    location: location
+                })
+            })
+            .catch(error => {
+                const { code, message } = error;
+                console.warn(code, message);
+            })
     };
 
     componentWillUnmount() {
@@ -65,20 +80,14 @@ export default class Register extends Component {
                         .set({
                             name: this.state.name,
                             email: this.state.email,
-                            phone: this.state.phone
+                            phone: this.state.phone,
+                            latitude: this.state.location.latitude,
+                            longitude: this.state.location.longitude
                         })
                         .catch(error => console.log(error.message))
 
                     ToastAndroid.show("Success", ToastAndroid.LONG)
-
-                    if (userCredentials.user) {
-                        userCredentials.user.updateProfile({
-                            phoneNumber: this.state.phone,
-                            displayName: this.state.name,
-                        }).then((s) => {
-                            this.props.navigation.navigate("Login")
-                        })
-                    }
+                    this.props.navigation.navigate("Login")
                 })
                 .catch(error => {
                     ToastAndroid.show(error.message, ToastAndroid.LONG)
@@ -87,6 +96,7 @@ export default class Register extends Component {
     }
 
     render() {
+        console.disableYellowBox = true
         return (
             <View style={styles.container}>
                 <LinearGradient start={{ x: 1, y: -2 }} colors={['#5ce1e6', '#352245']} style={styles.header}>

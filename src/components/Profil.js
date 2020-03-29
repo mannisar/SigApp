@@ -15,9 +15,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ImagePicker from 'react-native-image-picker';
 
-import AsyncStorage from '@react-native-community/async-storage';
 import firebase from 'firebase';
-import { auth, db } from "../config/index"
+import { db, auth } from "../config/index"
 import User from '../../User'
 
 export default class Profil extends Component {
@@ -25,7 +24,6 @@ export default class Profil extends Component {
         super(props)
         this._isMounted = false;
         this.state = {
-            uid: null,
             name: User.name,
             email: User.email,
             phone: User.phone,
@@ -33,19 +31,6 @@ export default class Profil extends Component {
                 ? { uri: User.image }
                 : require('../assets/images/ava-default.png'),
             upload: false,
-        }
-    }
-
-    async componentDidMount() {
-        await this.get()
-    }
-
-    async get() {
-        try {
-            const uid = await AsyncStorage.getItem("uid");
-            this.setState({ uid: uid })
-        } catch (error) {
-            console.log("Something went wrong", error);
         }
     }
 
@@ -99,7 +84,7 @@ export default class Profil extends Component {
     };
 
     updateUser = () => {
-        db.ref('user').child(this.state.uid).set(User);
+        db.ref('user').child(User.uid).set(User);
         Alert.alert('Success', 'succesfull.');
     };
 
@@ -141,12 +126,12 @@ export default class Profil extends Component {
         });
     };
 
-    handleLogout = async () => {
-        await AsyncStorage.removeItem('uid')
-        await auth.signOut()
+    handleLogout = () => {
+        auth.signOut()
     };
 
     render() {
+        console.disableYellowBox = true
         return (
             <View style={styles.container}>
                 <LinearGradient start={{ x: 1, y: -2 }} colors={['#5ce1e6', '#352245']} style={styles.header}>
@@ -172,29 +157,6 @@ export default class Profil extends Component {
                                 )}
                         </TouchableOpacity>
                     </View>
-                    {/* <View style={styles.input}>
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder="name"
-                            autoCapitalize="none"
-                            onChangeText={name => this.setState({ name })}
-                            value={this.state.name}
-                        />
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder="email"
-                            autoCapitalize="none"
-                            onChangeText={email => this.setState({ email })}
-                            value={this.state.email}
-                        />
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder="phone"
-                            autoCapitalize="none"
-                            onChangeText={phone => this.setState({ phone })}
-                            value={this.state.phone}
-                        />
-                    </View> */}
                 </View>
                 <View style={styles.footer}>
                     <TextInput

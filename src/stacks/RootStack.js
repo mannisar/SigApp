@@ -9,7 +9,7 @@ import Register from '../components/Register'
 import Home from '../components/Home'
 import Message from '../components/Message'
 import Contact from '../components/Contact'
-import Notification from '../components/Notification'
+import GoogleMap from '../components/GoogleMap'
 import Profil from '../components/Profil'
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
@@ -86,10 +86,10 @@ const TabNavigatior = createMaterialBottomTabNavigator({
             }
         }
     },
-    Notification: {
-        screen: Notification,
+    GoogleMap: {
+        screen: GoogleMap,
         navigationOptions: {
-            tabBarLabel: 'Notification',
+            tabBarLabel: 'Find Location',
             tabBarOptions: {
                 tabStyle: {
                     paddingVertical: 10
@@ -112,11 +112,11 @@ const TabNavigatior = createMaterialBottomTabNavigator({
             tabBarIcon: ({ tintColor, focused }) => {
                 if (focused) {
                     return (
-                        <FontAwesome name="bell" size={25} color={tintColor} />
+                        <FontAwesome name="map" size={25} color={tintColor} />
                     )
                 } else {
                     return (
-                        <FontAwesome name="bell" size={20} color={'gray'} />
+                        <FontAwesome name="map" size={20} color={'gray'} />
                     )
                 }
             }

@@ -102,6 +102,7 @@ export default class Sends extends Component {
     }
 
     render() {
+        console.disableYellowBox = true
         return (
             <View style={styles.container}>
                 <LinearGradient start={{ x: 1, y: -2 }} colors={['#5ce1e6', '#352245']} style={styles.header}>
