@@ -9,7 +9,6 @@ import {
     ToastAndroid
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import GetLocation from 'react-native-get-location'
 
 import { auth, db } from '../config/index'
 
@@ -19,41 +18,26 @@ export default class Register extends Component {
         this._isMounted = false
         this.state = {
             isVisible: false,
-            phone: '',
             name: '',
             email: '',
+            phone: '',
+            image: '',
             password: '',
-            latitude: null,
-            longitude: null,
+            latitude: '',
+            longitude: '',
             errorMessage: null,
             loading: false,
             updatesEnabled: false,
-            location: []
         }
         this.handleRegister = this.handleRegister.bind(this);
     }
 
     async componentDidMount() {
         this._isMounted = true;
-        await GetLocation.getCurrentPosition({
-            enableHighAccuracy: true,
-            timeout: 15000,
-        })
-            .then(location => {
-                console.log(location);
-                this.setState({
-                    location: location
-                })
-            })
-            .catch(error => {
-                const { code, message } = error;
-                console.warn(code, message);
-            })
     };
 
     componentWillUnmount() {
         this._isMounted = false;
-
     }
 
     handleRegister = async () => {
@@ -81,13 +65,22 @@ export default class Register extends Component {
                             name: this.state.name,
                             email: this.state.email,
                             phone: this.state.phone,
-                            latitude: this.state.location.latitude,
-                            longitude: this.state.location.longitude
+                            image: this.state.image,
+                            bio: "Sedang Sibuk!",
+                            latitude: this.state.latitude,
+                            longitude: this.state.longitude
                         })
                         .catch(error => console.log(error.message))
 
-                    ToastAndroid.show("Success", ToastAndroid.LONG)
-                    this.props.navigation.navigate("Login")
+                    if (userCredentials.user) {
+                        userCredentials.user.updateProfile({
+                            displayName: this.state.name,
+                            phoneNumber: this.state.phone,
+                            photoURL: this.state.image
+                        }).then((s) => {
+                            this.props.navigation.navigate("Login")
+                        })
+                    }
                 })
                 .catch(error => {
                     ToastAndroid.show(error.message, ToastAndroid.LONG)
@@ -143,20 +136,6 @@ export default class Register extends Component {
     }
 }
 
-const Toast = props => {
-    if (props.visible) {
-        ToastAndroid.showWithGravityAndOffset(
-            props.message,
-            ToastAndroid.LONG,
-            ToastAndroid.TOP,
-            1,
-            800,
-        );
-        return null;
-    }
-    return null;
-};
-
 const { width, height } = Dimensions.get('window');
 const width_textInput = width * 0.8;
 
@@ -172,9 +151,11 @@ var styles = StyleSheet.create({
         alignItems: 'center'
     },
     textHeader: {
+        flex: 1,
         color: 'white',
-        fontWeight: 'bold',
-        fontSize: 25
+        fontFamily: 'raleway.bold',
+        fontSize: 25,
+        top: 4
     },
     footer: {
         width: '100%',
@@ -185,7 +166,7 @@ var styles = StyleSheet.create({
     textInput: {
         width: width_textInput,
         fontSize: 20,
-        height: 75,
+        height: 50,
         fontFamily: 'raleway.bold',
         backgroundColor: '#f2f2f2',
         paddingHorizontal: 20,
@@ -203,8 +184,7 @@ var styles = StyleSheet.create({
     textLogin: {
         color: 'white',
         fontSize: 20,
-        height: 40,
-        paddingVertical: 10,
+        height: 25,
         fontFamily: 'raleway.bold'
     }
 });

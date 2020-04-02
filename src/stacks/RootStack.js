@@ -8,10 +8,13 @@ import Login from '../components/Login'
 import Register from '../components/Register'
 import Home from '../components/Home'
 import Message from '../components/Message'
-import Contact from '../components/Contact'
+import Find from '../components/Find'
 import GoogleMap from '../components/GoogleMap'
-import Profil from '../components/Profil'
+import Profile from '../components/Profile'
+import Friend from '../components/Friend'
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Entypo from 'react-native-vector-icons/Entypo';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const TabNavigatior = createMaterialBottomTabNavigator({
     Home: {
@@ -40,20 +43,20 @@ const TabNavigatior = createMaterialBottomTabNavigator({
             tabBarIcon: ({ tintColor, focused }) => {
                 if (focused) {
                     return (
-                        <FontAwesome name="comments" size={25} color={tintColor} />
+                        <Entypo name="chat" size={22} color={tintColor} />
                     )
                 } else {
                     return (
-                        <FontAwesome name="comments" size={20} color={'gray'} />
+                        <Entypo name="chat" size={20} color={'gray'} />
                     )
                 }
             }
         }
     },
-    Contact: {
-        screen: Contact,
+    Find: {
+        screen: Find,
         navigationOptions: {
-            tabBarLabel: 'Contact',
+            tabBarLabel: 'Find Friend',
             tabBarOptions: {
                 tabStyle: {
                     paddingVertical: 10
@@ -76,11 +79,11 @@ const TabNavigatior = createMaterialBottomTabNavigator({
             tabBarIcon: ({ tintColor, focused }) => {
                 if (focused) {
                     return (
-                        <FontAwesome name="id-card" size={25} color={tintColor} />
+                        <AntDesign name="adduser" size={25} color={tintColor} />
                     )
                 } else {
                     return (
-                        <FontAwesome name="id-card" size={20} color={'gray'} />
+                        <AntDesign name="adduser" size={20} color={'gray'} />
                     )
                 }
             }
@@ -89,7 +92,7 @@ const TabNavigatior = createMaterialBottomTabNavigator({
     GoogleMap: {
         screen: GoogleMap,
         navigationOptions: {
-            tabBarLabel: 'Find Location',
+            tabBarLabel: 'Location',
             tabBarOptions: {
                 tabStyle: {
                     paddingVertical: 10
@@ -112,11 +115,11 @@ const TabNavigatior = createMaterialBottomTabNavigator({
             tabBarIcon: ({ tintColor, focused }) => {
                 if (focused) {
                     return (
-                        <FontAwesome name="map" size={25} color={tintColor} />
+                        <FontAwesome name="map-marker" size={25} color={tintColor} />
                     )
                 } else {
                     return (
-                        <FontAwesome name="map" size={20} color={'gray'} />
+                        <FontAwesome name="map-marker" size={20} color={'gray'} />
                     )
                 }
             }
@@ -138,15 +141,20 @@ const AppStack = createStackNavigator({
             headerShown: false
         }
     },
-    // Map,
     Message: {
         screen: Message,
         navigationOptions: {
             headerShown: false
         }
     },
-    Profil: {
-        screen: Profil,
+    Profile: {
+        screen: Profile,
+        navigationOptions: {
+            headerShown: false
+        }
+    },
+    Friend: {
+        screen: Friend,
         navigationOptions: {
             headerShown: false
         }

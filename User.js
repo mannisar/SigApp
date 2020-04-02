@@ -1,11 +1,14 @@
-const User = {
-    uid: null,
-    name: null,
-    email: null,
-    phone: null,
-    image: null,
-    latitude: null,
-    longitude: null
+export const User = {
+    // uid: null,
+    name: "",
+    email: "",
+    phone: "",
+    image: "",
+    bio: "",
+    latitude: "",
+    longitude: ""
 }
 
-export default User;
+export const Msg = {
+    message: null
+}

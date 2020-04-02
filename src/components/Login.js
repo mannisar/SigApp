@@ -21,11 +21,6 @@ export default class Login extends Component {
         this.state = {
             email: '',
             password: '',
-            latitude: null,
-            longitude: null,
-            errorMessage: null,
-            visible: false,
-            Onprosess: false,
         };
     }
 
@@ -100,14 +95,13 @@ export default class Login extends Component {
                     </TouchableOpacity>
                     <Text style={styles.textRegister}>Don't Have Account?</Text>
                     <TouchableOpacity onPress={() => this.props.navigation.navigate('Register')}>
-                        <Text style={[styles.textRegister, { color: '#5ce1e6', marginBottom: 12 }]}>Register!</Text>
+                        <Text style={[styles.textRegister, { color: '#5ce1e6', marginBottom: 12 }]}>Register.</Text>
                     </TouchableOpacity>
                 </View>
             </View>
         )
     }
 }
-
 
 const { width } = Dimensions.get('window');
 const width_logo = width * 1;
@@ -138,7 +132,7 @@ var styles = StyleSheet.create({
     textInput: {
         width: width_textInput,
         fontSize: 20,
-        height: 75,
+        height: 50,
         fontFamily: 'raleway.bold',
         backgroundColor: '#f2f2f2',
         paddingHorizontal: 20,
@@ -155,14 +149,13 @@ var styles = StyleSheet.create({
     },
     textLogin: {
         color: 'white',
+        fontFamily: 'raleway.bold',
         fontSize: 20,
-        height: 40,
-        paddingVertical: 10,
-        fontFamily: 'raleway.bold'
+        height: 25
     },
     textRegister: {
-        fontSize: 18,
         fontFamily: 'raleway.bold',
+        fontSize: 18,
         marginTop: 8
     }
 });

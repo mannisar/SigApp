@@ -17,9 +17,9 @@ import ImagePicker from 'react-native-image-picker';
 
 import firebase from 'firebase';
 import { db, auth } from "../config/index"
-import User from '../../User'
+import { User } from '../../User'
 
-export default class Profil extends Component {
+export default class Profile extends Component {
     constructor(props) {
         super(props)
         this._isMounted = false;
@@ -29,9 +29,11 @@ export default class Profil extends Component {
             phone: User.phone,
             imageSource: User.image
                 ? { uri: User.image }
-                : require('../assets/images/ava-default.png'),
-            upload: false,
-        }
+                : { uri: 'https://firebasestorage.googleapis.com/v0/b/sigapp-fe8ef.appspot.com/o/profile_pictures%2Fava-default.png?alt=media&token=713d0ccb-be15-49f9-8db8-5b6d589578a8' },
+            bio: User.bio,
+            upload: false
+        },
+            this.handleLogout = this.handleLogout.bind(this);
     }
 
     onChangeImage = () => {
@@ -63,29 +65,20 @@ export default class Profil extends Component {
     };
 
     onSubmit = () => {
-        const { phone, email, name } = this.state;
+        const { name, bio } = this.state;
         if (name.length < 1) {
             ToastAndroid.show('Please input your fullname',
                 ToastAndroid.LONG);
-        } else if (email.length < 6) {
-            ToastAndroid.show(
-                'Please input a valid email address',
-                ToastAndroid.LONG);
-        } else if (phone.length < 12) {
-            ToastAndroid.show('Please input 12 Digit phone',
-                ToastAndroid.LONG);
         } else {
             User.name = name;
-            User.email = email;
-            User.phone = phone;
+            User.bio = bio;
             this.updateUser();
-            this.componentDidMount()
         }
     };
 
     updateUser = () => {
-        db.ref('user').child(User.uid).set(User);
-        Alert.alert('Success', 'succesfull.');
+        db.ref('user').child(auth.currentUser.uid).set(User);
+        Alert.alert('Info', 'Update Successful!');
     };
 
     updateUserImage = imageUrl => {
@@ -105,7 +98,7 @@ export default class Profil extends Component {
             .catch(error => {
                 this.setState({
                     upload: false,
-                    imageSource: require('../assets/images/ava-default.png'),
+                    imageSource: { uri: 'https://firebasestorage.googleapis.com/v0/b/sigapp-fe8ef.appspot.com/o/profile_pictures%2Fava-default.png?alt=media&token=713d0ccb-be15-49f9-8db8-5b6d589578a8' },
                 });
                 Alert.alert('Error:', error.message)
             });
@@ -126,8 +119,8 @@ export default class Profil extends Component {
         });
     };
 
-    handleLogout = () => {
-        auth.signOut()
+    handleLogout = async () => {
+        await auth.signOut()
     };
 
     render() {
@@ -138,7 +131,7 @@ export default class Profil extends Component {
                     <TouchableOpacity style={styles.menuBack} onPress={() => this.props.navigation.navigate('Home')}>
                         <FontAwesome name="arrow-left" color="white" size={25} />
                     </TouchableOpacity>
-                    <Text style={styles.textHeader}>PROFIL</Text>
+                    <Text style={styles.textHeader}>PROFILE</Text>
                 </LinearGradient>
                 <View style={styles.main}>
                     <View style={styles.logo}>
@@ -147,11 +140,7 @@ export default class Profil extends Component {
                                 <ActivityIndicator size="large" />
                             ) : (
                                     <Image
-                                        style={{
-                                            width: 80,
-                                            height: 80,
-                                            resizeMode: 'stretch',
-                                        }}
+                                        style={{ width: 100, height: 100, borderRadius: 50 }}
                                         source={this.state.imageSource}
                                     />
                                 )}
@@ -168,17 +157,10 @@ export default class Profil extends Component {
                     />
                     <TextInput
                         style={styles.textInput}
-                        placeholder="email"
+                        placeholder="bio"
                         autoCapitalize="none"
-                        onChangeText={email => this.setState({ email })}
-                        value={this.state.email}
-                    />
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="phone"
-                        autoCapitalize="none"
-                        onChangeText={phone => this.setState({ phone })}
-                        value={this.state.phone}
+                        onChangeText={(bio) => this.setState({ bio })}
+                        value={this.state.bio}
                     />
                     <TouchableOpacity onPress={this.onSubmit}>
                         <LinearGradient start={{ x: 1, y: -2 }} colors={['#5ce1e6', '#352245']} style={styles.saveProfile}>
@@ -211,27 +193,27 @@ var styles = StyleSheet.create({
         alignItems: 'center'
     },
     textHeader: {
+        flex: 1,
         color: 'white',
-        fontWeight: 'bold',
+        fontFamily: 'raleway.bold',
         fontSize: 25,
+        top: 4
     },
     menuBack: {
         position: 'absolute',
         right: 0,
         top: 0,
-        bottom: 0,
-        left: 0,
-        paddingTop: 15,
-        justifyContent: 'center',
-        paddingLeft: 15
+        bottom: 4,
+        left: 15,
+        justifyContent: 'center'
     },
     main: {
         width: '100%',
-        height: '22%',
+        height: '25%'
     },
     logo: {
         alignItems: 'center',
-        marginTop: 28
+        marginVertical: 28
     },
     input: {
         alignItems: 'center',
@@ -240,32 +222,29 @@ var styles = StyleSheet.create({
     textInput: {
         width: width_textInput,
         fontSize: 20,
-        height: 75,
+        height: 50,
         fontFamily: 'raleway.regular',
         backgroundColor: '#f2f2f2',
         paddingHorizontal: 20,
         paddingVertical: 15,
         borderRadius: 50,
-        marginBottom: 12
+        marginBottom: 15
     },
     footer: {
-        width: '100%',
-        height: '100%',
         alignItems: 'center',
-        marginBottom: 0
+        marginVertical: 18
     },
     saveProfile: {
         width: width_textInput,
-        paddingVertical: 10,
+        paddingVertical: 12,
         borderRadius: 50,
-        marginBottom: 12,
+        marginBottom: 15,
         alignItems: 'center'
     },
     textSaveProfile: {
         color: 'white',
+        fontFamily: 'raleway.bold',
         fontSize: 20,
-        height: 40,
-        paddingVertical: 10,
-        fontFamily: 'raleway.bold'
+        height: 25
     },
 });

@@ -2,100 +2,122 @@ import React, { Component } from 'react';
 import {
     View,
     Text,
-    TextInput,
     StyleSheet,
     Image,
     TouchableOpacity,
     Dimensions,
-    FlatList
+    FlatList,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import moment from 'moment'
+import GetLocation from 'react-native-get-location'
 import { db, auth } from "../config/index"
-import User from '../../User'
+import { User } from '../../User'
 
 export default class Messages extends Component {
     constructor(props) {
         super(props)
-        this._isMounted = false;
         this.state = {
             user: [],
-            uid: null,
-            latitude: '',
-            longitude: '',
-            message: 'BLABLABLA',
+            location: [],
+            did: false,
             num_messages_readed: 100,
-            dbRef: db.ref('user')
+            created_at: 'few seconds',
         }
     }
 
     async componentDidMount() {
-        this._isMounted = true;
-        await this.state.dbRef.on('child_added', val => {
-            let person = val.val();
-            person.uid = val.key;
-            if (person.uid === auth.currentUser.uid) {
-                User.uid = person.uid;
-                User.name = person.name;
-                User.email = person.email;
-                User.phone = person.phone;
-                User.image = person.image ? person.image : null;
-                User.latitude = person.latitude;
-                User.longitude = person.longitude;
-            } else {
-                this.setState(prevState => {
-                    return {
-                        user: [...prevState.user, person],
-                    };
-                });
-            }
-        });
+        await this.getLocation()
+        await this.getUser()
+        if (this.props.navigation.getParam('Render')) {
+            await this.getUser()
+        }
     }
 
     componentWillUnmount() {
-        this._isMounted = false;
-        this.state.dbRef.off();
+        db.ref('user').off()
+        db.ref('message').off()
+    }
+
+    getLocation() {
+        GetLocation.getCurrentPosition({
+            enableHighAccuracy: true,
+            timeout: 15000,
+        })
+            .then(location => {
+                db.ref('/user/' + auth.currentUser.uid).child("latitude").set(location.latitude)
+                db.ref('/user/' + auth.currentUser.uid).child("longitude").set(location.longitude);
+            })
+            .catch(error => {
+                const { code, message } = error;
+                console.warn(code, message);
+            })
+    }
+
+    getUser() {
+        db.ref('user').on('child_added', val => {
+            let person = val.val();
+            person.uid = val.key;
+            if (person.uid === auth.currentUser.uid) {
+                User.name = person.name;
+                User.email = person.email;
+                User.phone = person.phone;
+                User.image = person.image ? person.image : "";
+                User.bio = person.bio;
+                User.latitude = person.latitude;
+                User.longitude = person.longitude;
+            } else {
+                db.ref('message')
+                    .child(auth.currentUser.uid)
+                    .child(person.uid)
+                    .on('child_added', value => {
+                        person.last_time = value.val().time;
+                        person.last_message = value.val().message;
+                    });
+
+                db.ref('message')
+                    .child(auth.currentUser.uid)
+                    .child(person.uid)
+                    .on('value', value => {
+                        if (value.val()) {
+                            if (!this.state.user.includes(person)) {
+                                this.setState(prevState => {
+                                    return {
+                                        user: [...prevState.user, person],
+                                    };
+                                });
+                            }
+                        }
+                    });
+            }
+        })
     }
 
     renderItem = ({ item }) => {
         return (
             <TouchableOpacity style={styles.item_container} onPress={() => this.props.navigation.navigate('Message', item)}>
                 <Image
-                    source={item.image ? { uri: item.image } : require('../assets/images/Ava-Man.png')}
-                    style={{ width: 50, height: 50 }}
-                    resizeMode={'stretch'}
+                    source={item.image ? { uri: item.image } : { uri: 'https://firebasestorage.googleapis.com/v0/b/sigapp-fe8ef.appspot.com/o/profile_pictures%2Fava-default.png?alt=media&token=713d0ccb-be15-49f9-8db8-5b6d589578a8' }}
+                    style={{ width: 50, height: 50, borderRadius: 50 }}
                 />
                 <View style={styles.item_messages}>
                     <View style={{ flex: 1 }}>
-                        <Text style={{ color: 'black', fontWeight: item.readed ? null : 'bold' }}>
+                        <Text style={{ color: 'black' }}>
                             {item.name}
                         </Text>
-                        <Text style={{ color: 'black', fontSize: 12, fontWeight: item.readed ? null : 'regular' }}>
-                            {this.state.message}
+                        <Text style={{ color: 'black', fontSize: 12, top: 8 }}>
+                            {item.last_message}
                         </Text>
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={{ color: 'black', fontSize: 12, fontStyle: 'italic', fontWeight: item.readed ? null : 'bold', textAlign: 'right' }}>
-                            {item.created_at}
+                        <Text style={{ color: 'black', fontSize: 12, fontStyle: 'italic', textAlign: 'right' }}>
+                            {moment(item.last_time).format('LT')}
                         </Text>
-                        {item.readed ? null :
-                            <View style={styles.num_readed}>
-                                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>
-                                    {this.state.num_messages_readed > 99 ? "99+" : this.state.num_messages_readed}
-                                </Text>
-                            </View>
-                        }
                     </View>
                 </View>
             </TouchableOpacity>
-        )
-    }
-
-    ItemSeparatorComponent = () => {
-        return (
-            <View style={{ height: 1, paddingVertical: 10 }} />
         )
     }
 
@@ -103,32 +125,17 @@ export default class Messages extends Component {
         console.disableYellowBox = true
         return (
             <View style={styles.container}>
-                {/* <View style={styles.header}> */}
                 <LinearGradient start={{ x: 1, y: -2 }} colors={['#5ce1e6', '#352245']} style={styles.header}>
                     <Text style={styles.textHeader}>SIGAPP</Text>
-                    <TouchableOpacity style={styles.add} onPress={() => this.props.navigation.navigate('Profil')}>
+                    <TouchableOpacity style={styles.add} onPress={() => this.props.navigation.navigate('Profile')}>
                         <AntDesign name="setting" color="white" size={25} />
                     </TouchableOpacity>
                 </LinearGradient>
-                <View style={styles.selection}>
-                    <View style={styles.searchBar}>
-                        <Ionicons name="ios-search" color="gray" size={28} />
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder="search..."
-                        />
-                        <TouchableOpacity>
-                            <Ionicons name="ios-close" color="gray" size={25} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                {/* </View> */}
                 <View style={styles.footer}>
                     <FlatList
                         data={this.state.user}
                         renderItem={this.renderItem}
                         keyExtractor={(item) => item.uid}
-                        ItemSeparatorComponent={this.ItemSeparatorComponent}
                     />
                 </View>
             </View>
@@ -137,7 +144,6 @@ export default class Messages extends Component {
 }
 
 const { width } = Dimensions.get('window');
-const width_searchBar = width * 0.8
 
 var styles = StyleSheet.create({
     container: {
@@ -151,38 +157,23 @@ var styles = StyleSheet.create({
         alignItems: 'center'
     },
     textHeader: {
+        flex: 1,
         color: 'white',
-        fontWeight: 'bold',
-        fontSize: 25
+        fontFamily: 'raleway.bold',
+        fontSize: 25,
+        top: 4
     },
     add: {
         position: 'absolute',
-        right: 0,
+        right: 15,
         top: 0,
-        bottom: 0,
+        bottom: 4,
         left: 0,
-        paddingTop: 15,
         justifyContent: 'center',
         alignItems: 'flex-end',
-        paddingRight: 15
     },
     footer: {
-        height: '100%'
-    },
-    imgBackground: {
-        flex: 1,
         height: '100%',
-        width: '100%'
-    },
-    imageBackground_container: {
-        flex: 1,
-        flexDirection: 'row',
-        marginTop: '8%'
-    },
-    logo: {
-        flex: 1,
-        marginLeft: 10,
-        alignItems: 'center'
     },
     user: {
         flex: 2,
@@ -191,20 +182,11 @@ var styles = StyleSheet.create({
         marginBottom: 85,
         marginLeft: 50
     },
-    user_name: {
-        color: 'white',
-        fontSize: 24,
-        fontFamily: 'raleway.bold'
-    },
-    action: {
-        marginTop: 0,
-    },
-    icon: {
-        marginLeft: 18
-    },
     item_container: {
         flexDirection: 'row',
-        paddingHorizontal: 20
+        paddingVertical: 10,
+        paddingHorizontal: 22,
+        top: 10
     },
     item_messages: {
         flex: 1,
@@ -212,32 +194,5 @@ var styles = StyleSheet.create({
         paddingLeft: 15,
         borderBottomWidth: 1,
         borderBottomColor: '#f2f2f2'
-    },
-    num_readed: {
-        height: 20,
-        backgroundColor: '#5ce1e6',
-        paddingHorizontal: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 50,
-        marginTop: 3
-    },
-    selection: {
-        height: '13%',
-        alignItems: 'center'
-    },
-    searchBar: {
-        width: width_searchBar,
-        height: 40,
-        flexDirection: 'row',
-        backgroundColor: '#f2f2f2',
-        marginTop: 15,
-        borderRadius: 50,
-        alignItems: 'center',
-        paddingHorizontal: 15
-    },
-    textInput: {
-        flex: 1,
-        paddingHorizontal: 10
     }
 });
