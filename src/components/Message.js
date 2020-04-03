@@ -11,6 +11,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
+import moment from 'moment'
 import firebase from 'firebase';
 import { auth, db } from "../config/index"
 import { User } from '../../User'
@@ -61,17 +62,6 @@ export default class Sends extends Component {
         this.setState({ [key]: val });
     };
 
-    convertTime = time => {
-        let d = new Date(time);
-        let c = new Date();
-        let result = (d.getHours() < 10 ? '0' : '') + d.getHours() + ':';
-        result += (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
-        if (c.getDay() !== d.getDay()) {
-            result = d.getDay() + '' + d.getMonth() + '' + result;
-        }
-        return result;
-    };
-
     sendMessage = async () => {
         if (this.state.textMessage.length > 0) {
             let msgId = this.state.dbRef
@@ -95,16 +85,16 @@ export default class Sends extends Component {
             Msg.message = message
         }
     };
-    
+
     renderItem = ({ item }) => {
         return (
             <View
                 style={[styles.messageList, { alignSelf: item.from === User.name ? 'flex-end' : 'flex-start', backgroundColor: item.from === User.name ? '#352245' : 'gray' }]}>
-                <Text style={{ color: '#fff', padding: 7, fontSize: 16 }}>
+                <Text style={{ color: '#fff', padding: 2, fontSize: 16 }}>
                     {item.message}
                 </Text>
-                <Text style={{ color: '#eee', padding: 3, fontSize: 12 }}>
-                    {this.convertTime(item.time)}
+                <Text style={{ color: '#eee', padding: 2, fontSize: 10, }}>
+                    {moment(item.time).format('LT')}
                 </Text>
             </View>
         )
@@ -198,20 +188,20 @@ var styles = StyleSheet.create({
         flex: 1,
     },
     messageList: {
-        flexDirection: 'row',
         maxWidth: '60%',
         borderRadius: 5,
-        paddingHorizontal: 8,
-        marginTop: 10,
-        marginBottom: 10,
-        marginRight: 10,
-        marginLeft: 10
+        paddingHorizontal: 5,
+        paddingVertical: 1,
+        marginTop: 4,
+        marginLeft: 4,
+        marginRight: 4
     },
     mainMenu: {
         alignItems: 'center',
         flexDirection: 'row',
         backgroundColor: '#352245',
-        paddingVertical: 8
+        paddingVertical: 8,
+        marginTop: 4
     },
     textInput: {
         width: width_textInput,

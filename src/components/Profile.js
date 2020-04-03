@@ -6,10 +6,11 @@ import {
     StyleSheet,
     TouchableOpacity,
     Image,
-    Dimensions,
+    ScrollView,
     Alert,
     ActivityIndicator,
-    ToastAndroid
+    ToastAndroid,
+    Dimensions
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -25,7 +26,6 @@ export default class Profile extends Component {
         this._isMounted = false;
         this.state = {
             name: User.name,
-            email: User.email,
             phone: User.phone,
             imageSource: User.image
                 ? { uri: User.image }
@@ -65,13 +65,20 @@ export default class Profile extends Component {
     };
 
     onSubmit = () => {
-        const { name, bio } = this.state;
+        const { name, bio, phone } = this.state;
         if (name.length < 1) {
             ToastAndroid.show('Please input your fullname',
+                ToastAndroid.LONG);
+        } else if (bio.length < 1) {
+            ToastAndroid.show('Please input your bio',
+                ToastAndroid.LONG);
+        } else if (phone.length < 12) {
+            ToastAndroid.show('Please input 12 digit phone number',
                 ToastAndroid.LONG);
         } else {
             User.name = name;
             User.bio = bio;
+            User.phone = phone;
             this.updateUser();
         }
     };
@@ -134,52 +141,71 @@ export default class Profile extends Component {
                     <Text style={styles.textHeader}>PROFILE</Text>
                 </LinearGradient>
                 <View style={styles.main}>
-                    <View style={styles.logo}>
-                        <TouchableOpacity onPress={this.onChangeImage}>
-                            {this.state.upload ? (
-                                <ActivityIndicator size="large" />
-                            ) : (
-                                    <Image
-                                        style={{ width: 100, height: 100, borderRadius: 50 }}
-                                        source={this.state.imageSource}
-                                    />
-                                )}
-                        </TouchableOpacity>
+                    <TouchableOpacity onPress={this.onChangeImage}>
+                        {this.state.upload ? (
+                            <ActivityIndicator size="large" />
+                        ) : (
+                                <Image
+                                    style={{ width: '100%', height: '100%' }}
+                                    resizeMode={'stretch'}
+                                    source={this.state.imageSource}
+                                />
+                            )}
+                    </TouchableOpacity>
+                </View>
+                <ScrollView>
+                    <View style={styles.footer}>
+                        <Text style={styles.title}>NAME</Text>
+                        <View style={styles.box}>
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder="Name"
+                                autoCapitalize="none"
+                                onChangeText={name => this.setState({ name })}
+                                value={this.state.name}
+                            />
+                        </View>
+                        <Text style={[styles.title, { marginTop: 24 }]}>BIO</Text>
+                        <View style={styles.box}>
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder="Bio"
+                                autoCapitalize="none"
+                                onChangeText={(bio) => this.setState({ bio })}
+                                value={this.state.bio}
+                            />
+                        </View>
+                        <Text style={[styles.title, { marginTop: 24 }]}>PHONE</Text>
+                        <View style={styles.box}>
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder="Phone Number"
+                                keyboardType="number-pad"
+                                onChangeText={(phone) => this.setState({ phone })}
+                                value={this.state.phone}
+                            />
+                        </View>
+                        <View style={styles.button}>
+                            <TouchableOpacity onPress={this.onSubmit}>
+                                <LinearGradient start={{ x: 1, y: -2 }} colors={['#5ce1e6', '#352245']} style={styles.saveProfile}>
+                                    <Text style={styles.textSaveProfile}>SAVE</Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={this.handleLogout}>
+                                <LinearGradient start={{ x: 1, y: -2 }} colors={['#5ce1e6', '#352245']} style={styles.saveProfile}>
+                                    <Text style={styles.textSaveProfile}>LOGOUT</Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
-                <View style={styles.footer}>
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="name"
-                        autoCapitalize="none"
-                        onChangeText={name => this.setState({ name })}
-                        value={this.state.name}
-                    />
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="bio"
-                        autoCapitalize="none"
-                        onChangeText={(bio) => this.setState({ bio })}
-                        value={this.state.bio}
-                    />
-                    <TouchableOpacity onPress={this.onSubmit}>
-                        <LinearGradient start={{ x: 1, y: -2 }} colors={['#5ce1e6', '#352245']} style={styles.saveProfile}>
-                            <Text style={styles.textSaveProfile}>SAVE</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={this.handleLogout}>
-                        <LinearGradient start={{ x: 1, y: -2 }} colors={['#5ce1e6', '#352245']} style={styles.saveProfile}>
-                            <Text style={styles.textSaveProfile}>LOGOUT</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
-                </View>
+                </ScrollView>
             </View>
         )
     }
 }
 
 const { width } = Dimensions.get('window');
-const width_textInput = width * 0.8;
+const width_textInput = width * 0.9;
 
 var styles = StyleSheet.create({
     container: {
@@ -209,36 +235,38 @@ var styles = StyleSheet.create({
     },
     main: {
         width: '100%',
-        height: '25%'
-    },
-    logo: {
-        alignItems: 'center',
-        marginVertical: 28
-    },
-    input: {
-        alignItems: 'center',
-        marginTop: 14
-    },
-    textInput: {
-        width: width_textInput,
-        fontSize: 20,
-        height: 50,
-        fontFamily: 'raleway.regular',
-        backgroundColor: '#f2f2f2',
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-        borderRadius: 50,
-        marginBottom: 15
+        height: '40%',
     },
     footer: {
+        marginVertical: 24,
+        marginHorizontal: 24,
+    },
+    title: {
+        fontFamily: 'raleway.bold',
+        fontSize: 20,
+        height: 25,
+    },
+    box: {
+        borderColor: '#5ce1e6',
+        borderBottomWidth: 2,
+        marginVertical: 4
+    },
+    textInput: {
+        fontSize: 20,
+        fontFamily: 'raleway.regular',
+        left: -4
+    },
+    button: {
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
-        marginVertical: 18
+        paddingVertical: 12
     },
     saveProfile: {
         width: width_textInput,
         paddingVertical: 12,
         borderRadius: 50,
-        marginBottom: 15,
+        marginTop: 10,
         alignItems: 'center'
     },
     textSaveProfile: {
@@ -246,5 +274,5 @@ var styles = StyleSheet.create({
         fontFamily: 'raleway.bold',
         fontSize: 20,
         height: 25
-    },
+    }
 });

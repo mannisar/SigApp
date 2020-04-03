@@ -7,13 +7,14 @@ import {
     TouchableOpacity,
     FlatList,
     Image,
-    PermissionsAndroid,
-    Dimensions
+    // PermissionsAndroid,
+    Dimensions,
+    Linking
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 
-import SendIntentAndroid from 'react-native-send-intent'
+// import SendIntentAndroid from 'react-native-send-intent'
 import { db } from "../config/index"
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -32,23 +33,30 @@ export default class Find extends Component {
         db.ref('message').off()
     }
 
-    requestCallPhone = async (number) => {
-        try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.CALL_PHONE, {
-                'title': 'App Call Phone Permission',
-                'message': 'App needs access to your call phone feature'
-            }
-            )
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                SendIntentAndroid.sendPhoneCall(number, true);
-            } else {
-                console.log("Call Phone permission denied")
-            }
-        } catch (err) {
-            console.warn(err)
-        }
-    }
+    // requestCallPhone = async (number) => {
+    //     try {
+    //         const granted = await PermissionsAndroid.request(
+    //             PermissionsAndroid.PERMISSIONS.CALL_PHONE, {
+    //             'title': 'App Call Phone Permission',
+    //             'message': 'App needs access to your call phone feature'
+    //         }
+    //         )
+    //         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+    //             SendIntentAndroid.sendPhoneCall(number, true);
+    //         } else {
+    //             console.log("Call Phone permission denied")
+    //         }
+    //     } catch (err) {
+    //         console.warn(err)
+    //     }
+    // }
+
+    requestCallPhone = (number) => {
+        let phoneNumber = '';
+        if (Platform.OS === 'android') { phoneNumber = `tel:${number}`; }
+        else { phoneNumber = `telprompt:${number}`; }
+        Linking.openURL(phoneNumber);
+    };
 
     onSubmit = (search) => {
         db.ref('user').on('child_added', val => {

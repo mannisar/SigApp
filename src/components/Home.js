@@ -5,8 +5,7 @@ import {
     StyleSheet,
     Image,
     TouchableOpacity,
-    Dimensions,
-    FlatList,
+    FlatList
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -108,7 +107,7 @@ export default class Messages extends Component {
                             {item.name}
                         </Text>
                         <Text style={{ color: 'black', fontSize: 12, top: 8 }}>
-                            {item.last_message}
+                            {item.last_message.slice(0, 28)}
                         </Text>
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
@@ -142,8 +141,6 @@ export default class Messages extends Component {
         )
     }
 }
-
-const { width } = Dimensions.get('window');
 
 var styles = StyleSheet.create({
     container: {

@@ -43,11 +43,11 @@ export default class Register extends Component {
     handleRegister = async () => {
         const { phone, email, name, password } = this.state;
         if (phone.length < 12) {
-            ToastAndroid.show('Please input your phone',
+            ToastAndroid.show('Please input 12 digit phone number',
                 ToastAndroid.LONG);
         }
         else if (name.length < 1) {
-            ToastAndroid.show('Please input your fullname',
+            ToastAndroid.show('Please input your name',
                 ToastAndroid.LONG);
         } else if (email.length < 6) {
             ToastAndroid.show(
@@ -105,7 +105,7 @@ export default class Register extends Component {
                     />
                     <TextInput
                         style={styles.textInput}
-                        placeholder="Full Name"
+                        placeholder="Name"
                         autoCapitalize="none"
                         onChangeText={name => this.setState({ name })}
                         value={this.state.name}

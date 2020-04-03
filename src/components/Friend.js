@@ -5,7 +5,6 @@ import {
     StyleSheet,
     TouchableOpacity,
     Image,
-    Dimensions,
     ActivityIndicator,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -35,19 +34,15 @@ export default class Friend extends Component {
                     <TouchableOpacity style={styles.menuBack} onPress={() => this.props.navigation.navigate('Message')}>
                         <FontAwesome name="arrow-left" color="white" size={25} />
                     </TouchableOpacity>
-                    <Text style={styles.textHeader}>PROFILE</Text>
+                    <Text style={styles.textHeader}>{this.state.name}</Text>
                 </LinearGradient>
                 <View style={styles.main}>
-                    <TouchableOpacity onPress={this.onChangeImage}>
-                        {this.state.upload ? (
-                            <ActivityIndicator size="large" />
-                        ) : (
-                                <Image
-                                    style={{ width: '100%', height: '100%' }}
-                                    resizeMode={'stretch'}
-                                    source={this.state.imageSource}
-                                />
-                            )}
+                    <TouchableOpacity>
+                        <Image
+                            style={{ width: '100%', height: '100%' }}
+                            resizeMode={'stretch'}
+                            source={this.state.imageSource}
+                        />
                     </TouchableOpacity>
                 </View>
                 <ScrollView>
@@ -70,8 +65,6 @@ export default class Friend extends Component {
         )
     }
 }
-
-const { width } = Dimensions.get('window');
 
 var styles = StyleSheet.create({
     container: {
