@@ -1,6 +1,6 @@
 # TABLE OF CONTENTS
 - [RELEASE APK](#release-apk)
-- [SCREENSHOT DEMO](#screenshoot-demo)
+- [SCREENSHOT DEMO](#screenshot-demo)
 - [FEATURES](#FEATURES)
 - [SOFTWARE I USE](#software-i-use)
 - [INSTALLATION](#INSTALLATION)
@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/Download%20on%20the-Google%20Drive-blue.svg?style=popout&logo=google-drive"/>
 </a>
 
-## SCREENSHOOT DEMO
+## SCREENSHOT DEMO
 - <b> LOGIN & REGISTER </b>
 ![Login   Register](https://user-images.githubusercontent.com/42530153/78322613-787b1600-7599-11ea-9d57-3735d39e0af5.jpg)
 
