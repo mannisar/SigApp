@@ -35,10 +35,12 @@
 
 ## INSTALLATION
 ```bash
+$ git clone https://github.com/mannisar/SigApp.git
 $ npm install
 ```
 
 ### START THE PROJECT
 ```bash
-$ npm start
+$ connect your device handphone 'adb devices' or emulator. and then
+$ npx react-native run-android
 ```
