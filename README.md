@@ -1,9 +1,15 @@
 # TABLE OF CONTENTS
+- [RELEASE APK](#release-apk)
 - [SCREENSHOT DEMO](#screenshoot-demo)
 - [FEATURES](#FEATURES)
 - [SOFTWARE I USE](#software-i-use)
 - [INSTALLATION](#INSTALLATION)
 <hr>
+
+# RELEASE APK
+<a href="https://drive.google.com/file/d/16bVIYVdjyfRWiJOJUl_OynUv5-3a0KiD/view?usp=sharing">
+  <img src="https://img.shields.io/badge/Download%20on%20the-Google%20Drive-blue.svg?style=popout&logo=google-drive"/>
+</a>
 
 ## SCREENSHOOT DEMO
 - <b> LOGIN & REGISTER </b>
@@ -19,7 +25,7 @@
 - <b>REAL TIME CHAT</b>
 - <b>REAL TIME MAPS</b>
 - <b>FIND FRIENDS BY NAME</b>
-- <b>MANAGA PROFILE</b>
+- <b>MANAGE PROFILE</b>
 <hr>
 
 ## INCLUDES
